@@ -11,5 +11,8 @@ min_detection_confidence = 0.5
 min_tracking_confidence = 0.5
 segmentation_score_th = 0.5
 
-use_brect = True
-plot_world_landmark = True
+# 検出範囲を枠で囲うか
+use_brect = False
+
+# 位置情報をプロットするか
+plot_world_landmark = False

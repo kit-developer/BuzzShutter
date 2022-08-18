@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import copy
 
-import cv2 as cv
+import cv2
 import mediapipe as mp
 
 import config
@@ -17,20 +17,14 @@ def main():
 
     # upper_body_only = config.upper_body_only
     smooth_landmarks = not config.unuse_smooth_landmarks
-    enable_segmentation = config.enable_segmentation
-    smooth_segmentation = config.smooth_segmentation
     model_complexity = config.model_complexity
     min_detection_confidence = config.min_detection_confidence
     min_tracking_confidence = config.min_tracking_confidence
-    segmentation_score_th = config.segmentation_score_th
-
-    use_brect = config.use_brect
-    plot_world_landmark = config.plot_world_landmark
 
     # カメラ準備 ###############################################################
-    cap = cv.VideoCapture(cap_device)
-    cap.set(cv.CAP_PROP_FRAME_WIDTH, cap_width)
-    cap.set(cv.CAP_PROP_FRAME_HEIGHT, cap_height)
+    cap = cv2.VideoCapture(cap_device)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, cap_width)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, cap_height)
 
     # モデルロード #############################################################
     mp_holistic = mp.solutions.holistic
@@ -45,7 +39,7 @@ def main():
     )
 
     # World座標プロット ########################################################
-    if plot_world_landmark:
+    if config.plot_world_landmark:
         import matplotlib.pyplot as plt
 
         fig = plt.figure()
@@ -58,11 +52,11 @@ def main():
         ret, image = cap.read()
         if not ret:
             break
-        image = cv.flip(image, 1)  # ミラー表示
+        image = cv2.flip(image, 1)  # ミラー表示
         debug_image = copy.deepcopy(image)
 
         # 検出実施
-        image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         image.flags.writeable = False
         results = holistic.process(image)
         image.flags.writeable = True
@@ -71,31 +65,27 @@ def main():
         draw_parts.face_mesh(debug_image, results, config)
 
         # Pose
-        draw_parts.pose(debug_image, results, config)
+        # draw_parts.pose(debug_image, results, config)
 
         # Pose:World座標プロット
-        if plot_world_landmark:
+        if config.plot_world_landmark:
             if results.pose_world_landmarks is not None:
-                plot_world_landmarks(
-                    plt,
-                    ax,
-                    results.pose_world_landmarks,
-                )
+                plot_world_landmarks(plt, ax, results.pose_world_landmarks)
 
         # Hands
-        draw_parts.left_hand(debug_image, results, config)
-        draw_parts.right_hand(debug_image, results, config)
+        # draw_parts.left_hand(debug_image, results, config)
+        # draw_parts.right_hand(debug_image, results, config)
 
         # キー処理(ESC：終了)
-        key = cv.waitKey(1)
+        key = cv2.waitKey(1)
         if key == 27:  # ESC
             break
 
         # 画面反映
-        cv.imshow('BuzzShutter', debug_image)
+        cv2.imshow('BuzzShutter', debug_image)
 
     cap.release()
-    cv.destroyAllWindows()
+    cv2.destroyAllWindows()
 
 
 def plot_world_landmarks(

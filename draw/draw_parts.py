@@ -1,5 +1,5 @@
 import numpy as np
-import cv2 as cv
+import cv2
 
 from draw import draw_points as dp
 
@@ -112,7 +112,7 @@ def calc_palm_moment(image, landmarks):
             palm_array = np.append(palm_array, landmark_point, axis=0)
         if index == 17:  # 小指：付け根
             palm_array = np.append(palm_array, landmark_point, axis=0)
-    M = cv.moments(palm_array)
+    M = cv2.moments(palm_array)
     cx, cy = 0, 0
     if M['m00'] != 0:
         cx = int(M['m10'] / M['m00'])
@@ -134,6 +134,6 @@ def calc_bounding_rect(image, landmarks):
 
         landmark_array = np.append(landmark_array, landmark_point, axis=0)
 
-    x, y, w, h = cv.boundingRect(landmark_array)
+    x, y, w, h = cv2.boundingRect(landmark_array)
 
     return [x, y, x + w, y + h]
