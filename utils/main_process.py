@@ -33,7 +33,7 @@ def run(image, model):
     image = effect.kirakira_effect(image)
 
     if len(iris_position) > 0:
-        if sum(iris_position[0]) > 0.8:
+        if sum(iris_position[0]) > 1:
             debug_image = cv2.cvtColor(debug_image, cv2.COLOR_BGR2RGB)
 
             taken_photo = image
