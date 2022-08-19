@@ -65,12 +65,13 @@ def image():
     model = use_mediapipe.load_refine_face_model(config)
 
     # メイン処理
-    debug_image, results, _ = main_process.run(image, model)
+    debug_image, results, taken_photo = main_process.run(image, model)
 
     # 画面反映
-    cv2.imshow('BuzzShutter', debug_image)
+    cv2.imshow('BuzzShutter(detection)', debug_image)
+    cv2.imshow('BuzzShutter', taken_photo)
     cv2.waitKey(0)
 
 
 if __name__ == '__main__':
-    stream()
+    image()

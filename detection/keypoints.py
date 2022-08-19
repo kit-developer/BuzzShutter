@@ -16,3 +16,8 @@ right_eye_upper_idx = [362, 398, 384, 385, 386, 387, 388, 466]
 right_eye_lower_idx = [466, 390, 373, 374, 380, 381, 382, 362]
 
 between_the_eyebrows = [8, 9]
+
+
+# でこ
+right_head = 54
+left_head = 284

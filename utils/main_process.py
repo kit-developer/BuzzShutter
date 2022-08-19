@@ -4,13 +4,16 @@ import numpy as np
 
 import config
 from draw import draw_parts
+from draw import draw_face_parts as dfp
 from utils import use_mediapipe
+from detection import keypoints as kp
 from detection import calc_eye_width as cew
+from effect import effect
 
 
 def run(image, model):
 
-    taked_photo = None
+    taken_photo = np.zeros(image.shape, np.uint8)
 
     image = cv2.flip(image, 1)  # ミラー表示
     debug_image = copy.deepcopy(image)
@@ -27,10 +30,13 @@ def run(image, model):
     iris_position = cew.iris_position(debug_image, results)
 
     if len(iris_position) > 0:
-        print(sum(iris_position[0]))
+        # print(sum(iris_position[0]))
         if sum(iris_position[0]) > 0.8:
             debug_image = cv2.cvtColor(debug_image, cv2.COLOR_BGR2RGB)
-            taken_photo = image
+            # image = effect.Winter(image)
+
+    image = effect.overlay_filter(results, image)
+    taken_photo = image
 
     # Pose
     # draw_parts.pose(debug_image, results, config)

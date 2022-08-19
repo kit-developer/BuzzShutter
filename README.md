@@ -1,6 +1,6 @@
 ## 実行方法
 
-`$ pip install mediapipe opencv-python`
+`$ pip install mediapipe opencv-python scipy`
 
 `$ python main.py`
 
