@@ -13,4 +13,4 @@ http://cedro3.com/ai/mediapipe/
 
 mediapipeで虹彩検出
 
-https://github.com/Kazuhito00/iris-detection-using-py-mediapipe
+https://github.com/Kazuhito00/mediapipe-python-sample

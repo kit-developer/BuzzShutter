@@ -5,6 +5,8 @@ height = 540
 unuse_smooth_landmarks = True
 enable_segmentation = True
 smooth_segmentation = True
+
+# 虹彩検出をするか
 refine_landmarks = True
 
 model_complexity = 1

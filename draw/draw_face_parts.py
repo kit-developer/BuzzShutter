@@ -2,6 +2,24 @@ import numpy as np
 import cv2
 
 
+def get_landmark_points(image, landmarks):
+    image_width, image_height = image.shape[1], image.shape[0]
+
+    landmark_point = []
+
+    for index, landmark in enumerate(landmarks.landmark):
+        if landmark.visibility < 0 or landmark.presence < 0:
+            continue
+
+        landmark_x = min(int(landmark.x * image_width), image_width - 1)
+        landmark_y = min(int(landmark.y * image_height), image_height - 1)
+        # landmark_z = landmark.z
+
+        landmark_point.append((landmark_x, landmark_y))
+
+    return landmark_point
+
+
 def calc_bounding_rect(image, landmarks):
     image_width, image_height = image.shape[1], image.shape[0]
 
@@ -74,7 +92,10 @@ def draw_landmarks(image, landmarks, refine_landmarks, left_eye, right_eye):
 
         landmark_point.append((landmark_x, landmark_y))
 
-        cv2.circle(image, (landmark_x, landmark_y), 1, (0, 255, 0), 1)
+        if False:
+            cv2.circle(image, (landmark_x, landmark_y), 3, (255, 0, 255), 1)
+        else:
+            cv2.circle(image, (landmark_x, landmark_y), 1, (0, 255, 0), 1)
 
     if len(landmark_point) > 0:
         # 参考：https://github.com/tensorflow/tfjs-models/blob/master/facemesh/mesh_map.jpg
