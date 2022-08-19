@@ -7,8 +7,6 @@ import mediapipe as mp
 
 import config
 from draw import draw_parts
-from detection import trim, preprocess
-from mediapipe_iris.iris_landmark import IrisLandmark
 
 
 def main():
@@ -47,8 +45,6 @@ def main():
         min_tracking_confidence=min_tracking_confidence,
         refine_landmarks=refine_landmarks,
     )
-    # iris_detector = IrisLandmark()
-
 
     # 位置情報プロット準備
     if config.plot_world_landmark:
@@ -99,8 +95,6 @@ def main():
 
         # 画面反映
         cv2.imshow('BuzzShutter', debug_image)
-        # cv2.imshow('left eye', eye_images[0])
-        # cv2.imshow('right eye', eye_images[1])
 
     cap.release()
     cv2.destroyAllWindows()
