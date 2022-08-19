@@ -64,6 +64,31 @@ def LookupTable(x, y):
   return spline(range(256))
 
 
+video = cv2.VideoCapture('image_sample/star_03.mp4')
+
+def kirakira_effect(image):
+    ret, frame = video.read()
+    if ret:
+        frame = cv2.resize(frame, dsize=(image.shape[1], image.shape[0]))
+
+        frame_rgba = cv2.cvtColor(frame, cv2.COLOR_RGB2RGBA)
+        frame_rgba[:, :, 3] = frame[:, :, 0]
+        for i in range(3):
+            frame_rgba[:, :, i] = 255
+
+        # overlay_image = np.where(frame[:, :, :] == 0, image, frame)
+        image[:, :] = image[:, :] * (1 - frame_rgba[:, :, 3:] / 255) + frame_rgba[:, :, :3] * (frame_rgba[:, :, 3:] / 255)
+        overlay_image = image
+
+        overlay_image = cv2.cvtColor(overlay_image, cv2.COLOR_RGBA2RGB)
+
+        return overlay_image
+
+    else:
+        video.set(cv2.CAP_PROP_POS_FRAMES, 0)
+
+
+
 nekomimi_image = cv2.imread("image_sample/nekomimi_black1.png")
 nekohige_image = cv2.imread("image_sample/nekohige2.png")
 
@@ -84,7 +109,7 @@ def overlay_filter(results, image):
             right_upper = [- w * h_w * np.sin(theta) + right_lower[0], w * h_w * np.cos(theta) + right_lower[1]]
 
             dst_pts = [left_upper, right_upper, left_lower, right_lower]
-            overlay_image = overlay(nekomimi_image, src_pts, image, dst_pts)
+            image = overlay(nekomimi_image, src_pts, image, dst_pts)
 
             # 猫ひげ
             left, right, center = land_pts[kp.left_face], land_pts[kp.right_face], land_pts[kp.nose_top]
@@ -114,9 +139,9 @@ def overlay_filter(results, image):
                            [w * h_w / 2 * np.sin(theta) + center[0], - w * h_w / 2 * np.cos(theta) + center[1]],
                            [w * h_w / 2 * np.sin(theta) + right[0], - w * h_w / 2 * np.cos(theta) + right[1]]]
 
-            overlay_image = overlay(nekohige_image, src_pts, overlay_image, dst_pts)
+            image = overlay(nekohige_image, src_pts, image, dst_pts)
 
-            return overlay_image
+    return image
 
 
 def overlay(fore_image, src_pts, back_image, dst_pts):

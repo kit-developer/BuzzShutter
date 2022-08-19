@@ -8,6 +8,8 @@ import config
 from plot import pose_plot as pp
 from utils import camera_stream, use_mediapipe, main_process
 
+import time
+
 
 def stream():
 
@@ -24,6 +26,8 @@ def stream():
 
     photo = np.zeros((400, 600, 3), np.uint8)
 
+    taken_time = time.time()
+
     while True:
 
         # カメラキャプチャ
@@ -36,6 +40,10 @@ def stream():
 
         if taken is not None:
             photo = taken
+            taken_time = time.time()
+        if time.time() - taken_time > 3:
+            photo = np.where(photo[:, :, :] > 0, photo[:, :, :] - 1, 0)
+
         cv2.imshow("last shot", photo)
 
         # Pose:位置情報プロット

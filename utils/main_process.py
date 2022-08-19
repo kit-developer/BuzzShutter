@@ -13,7 +13,7 @@ from effect import effect
 
 def run(image, model):
 
-    taken_photo = np.zeros(image.shape, np.uint8)
+    taken_photo = None  # np.zeros(image.shape, np.uint8)
 
     image = cv2.flip(image, 1)  # ミラー表示
     debug_image = copy.deepcopy(image)
@@ -29,14 +29,14 @@ def run(image, model):
 
     iris_position = cew.iris_position(debug_image, results)
 
+    image = effect.overlay_filter(results, image)
+    image = effect.kirakira_effect(image)
+
     if len(iris_position) > 0:
-        # print(sum(iris_position[0]))
         if sum(iris_position[0]) > 0.8:
             debug_image = cv2.cvtColor(debug_image, cv2.COLOR_BGR2RGB)
-            # image = effect.Winter(image)
 
-    image = effect.overlay_filter(results, image)
-    taken_photo = image
+            taken_photo = image
 
     # Pose
     # draw_parts.pose(debug_image, results, config)
