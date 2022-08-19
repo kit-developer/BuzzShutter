@@ -7,6 +7,8 @@ import mediapipe as mp
 
 import config
 from draw import draw_parts
+from detection import trim, preprocess
+from mediapipe_iris.iris_landmark import IrisLandmark
 
 
 def main():
@@ -20,13 +22,14 @@ def main():
     model_complexity = config.model_complexity
     min_detection_confidence = config.min_detection_confidence
     min_tracking_confidence = config.min_tracking_confidence
+    refine_landmarks = config.refine_landmarks
 
-    # カメラ準備 ###############################################################
+    # カメラ準備
     cap = cv2.VideoCapture(cap_device)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, cap_width)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, cap_height)
 
-    # モデルロード #############################################################
+    # モデルロード
     mp_holistic = mp.solutions.holistic
     holistic = mp_holistic.Holistic(
         # upper_body_only=upper_body_only,
@@ -37,8 +40,17 @@ def main():
         min_detection_confidence=min_detection_confidence,
         min_tracking_confidence=min_tracking_confidence,
     )
+    mp_face_mesh = mp.solutions.face_mesh
+    face_mesh_model = mp_face_mesh.FaceMesh(
+        max_num_faces=1,
+        min_detection_confidence=min_detection_confidence,
+        min_tracking_confidence=min_tracking_confidence,
+        refine_landmarks=refine_landmarks,
+    )
+    # iris_detector = IrisLandmark()
 
-    # World座標プロット ########################################################
+
+    # 位置情報プロット準備
     if config.plot_world_landmark:
         import matplotlib.pyplot as plt
 
@@ -58,23 +70,27 @@ def main():
         # 検出実施
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         image.flags.writeable = False
-        results = holistic.process(image)
+        results_holistic = holistic.process(image)
+        results_face = face_mesh_model.process(image)
         image.flags.writeable = True
 
         # Face Mesh
-        draw_parts.face_mesh(debug_image, results, config)
+        # draw_parts.face_mesh(debug_image, results_holistic, config)
 
         # Pose
         # draw_parts.pose(debug_image, results, config)
 
-        # Pose:World座標プロット
+        # Pose:位置情報プロット
         if config.plot_world_landmark:
-            if results.pose_world_landmarks is not None:
-                plot_world_landmarks(plt, ax, results.pose_world_landmarks)
+            if results_holistic.pose_world_landmarks is not None:
+                plot_world_landmarks(plt, ax, results_holistic.pose_world_landmarks)
 
         # Hands
         # draw_parts.left_hand(debug_image, results, config)
         # draw_parts.right_hand(debug_image, results, config)
+
+        # 目を切り抜き
+        debug_image = draw_parts.face_mesh_neo(debug_image, results_face, config)
 
         # キー処理(ESC：終了)
         key = cv2.waitKey(1)
@@ -83,6 +99,8 @@ def main():
 
         # 画面反映
         cv2.imshow('BuzzShutter', debug_image)
+        # cv2.imshow('left eye', eye_images[0])
+        # cv2.imshow('right eye', eye_images[1])
 
     cap.release()
     cv2.destroyAllWindows()

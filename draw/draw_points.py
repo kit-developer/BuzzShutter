@@ -1,6 +1,40 @@
 import cv2
 
 
+def draw_iris_landmark(
+    debug_image,
+    left_iris,
+    right_iris,
+    left_center,
+    left_radius,
+    right_center,
+    right_radius,
+):
+    # 虹彩：外接円
+    cv2.circle(debug_image, left_center, left_radius, (0, 255, 0), 2)
+    cv2.circle(debug_image, right_center, right_radius, (0, 255, 0), 2)
+
+    # 虹彩：ランドマーク
+    for point in left_iris:
+        cv2.circle(debug_image, (point[0], point[1]), 1, (0, 0, 255), 2)
+    for point in right_iris:
+        cv2.circle(debug_image, (point[0], point[1]), 1, (0, 0, 255), 2)
+
+    # 虹彩：半径
+    cv2.putText(debug_image, 'r:' + str(left_radius) + 'px',
+               (left_center[0] + int(left_radius * 1.5),
+                left_center[1] + int(left_radius * 0.5)),
+               cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 1)
+    cv2.putText(debug_image, 'r:' + str(right_radius) + 'px',
+               (right_center[0] + int(right_radius * 1.5),
+                right_center[1] + int(right_radius * 0.5)),
+               cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 1)
+
+    return debug_image
+
+
+
+
 def draw_hands_landmarks(
         image,
         cx,

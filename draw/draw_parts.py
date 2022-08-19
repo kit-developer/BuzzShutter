@@ -1,7 +1,9 @@
 import numpy as np
 import cv2
+import copy
 
 from draw import draw_points as dp
+from draw import draw_face_parts as dfp
 
 
 def face_mesh(debug_image, results, config):
@@ -80,6 +82,115 @@ def right_hand(debug_image, results, config):
         )
         debug_image = dp.draw_bounding_rect(config.use_brect, debug_image, brect)
 
+    return debug_image
+
+
+# def iris(image, face_mesh_model, iris_detector, debug_image):
+#     # Face Mesh検出
+#     face_results = face_mesh_model(image)
+#     for face_result in face_results:
+#         # 目周辺のバウンディングボックス計算
+#         left_eye, right_eye = face_mesh_model.calc_around_eye_bbox(face_result)
+#
+#         # 虹彩検出
+#         left_iris, right_iris = detect_iris(image, iris_detector, left_eye,
+#                                             right_eye)
+#
+#         # 虹彩の外接円を計算
+#         left_center, left_radius = calc_min_enc_losingCircle(left_iris)
+#         right_center, right_radius = calc_min_enc_losingCircle(right_iris)
+#
+#         # デバッグ描画
+#         debug_image = dp.draw_iris_landmark(
+#             debug_image,
+#             left_iris,
+#             right_iris,
+#             left_center,
+#             left_radius,
+#             right_center,
+#             right_radius,
+#         )
+#
+#
+# def detect_iris(image, iris_detector, left_eye, right_eye):
+#     image_width, image_height = image.shape[1], image.shape[0]
+#     input_shape = iris_detector.get_input_shape()
+#
+#     # 左目
+#     # 目の周辺の画像を切り抜き
+#     left_eye_x1 = max(left_eye[0], 0)
+#     left_eye_y1 = max(left_eye[1], 0)
+#     left_eye_x2 = min(left_eye[2], image_width)
+#     left_eye_y2 = min(left_eye[3], image_height)
+#     left_eye_image = copy.deepcopy(image[left_eye_y1:left_eye_y2,
+#                                          left_eye_x1:left_eye_x2])
+#     # 虹彩検出
+#     eye_contour, iris = iris_detector(left_eye_image)
+#     # 座標を相対座標から絶対座標に変換
+#     left_iris = calc_iris_point(left_eye, eye_contour, iris, input_shape)
+#
+#     # 右目
+#     # 目の周辺の画像を切り抜き
+#     right_eye_x1 = max(right_eye[0], 0)
+#     right_eye_y1 = max(right_eye[1], 0)
+#     right_eye_x2 = min(right_eye[2], image_width)
+#     right_eye_y2 = min(right_eye[3], image_height)
+#     right_eye_image = copy.deepcopy(image[right_eye_y1:right_eye_y2,
+#                                           right_eye_x1:right_eye_x2])
+#     # 虹彩検出
+#     eye_contour, iris = iris_detector(right_eye_image)
+#     # 座標を相対座標から絶対座標に変換
+#     right_iris = calc_iris_point(right_eye, eye_contour, iris, input_shape)
+#
+#     return left_iris, right_iris
+#
+#
+# def calc_iris_point(eye_bbox, eye_contour, iris, input_shape):
+#     iris_list = []
+#     for index in range(5):
+#         point_x = int(iris[index * 3] *
+#                       ((eye_bbox[2] - eye_bbox[0]) / input_shape[0]))
+#         point_y = int(iris[index * 3 + 1] *
+#                       ((eye_bbox[3] - eye_bbox[1]) / input_shape[1]))
+#         point_x += eye_bbox[0]
+#         point_y += eye_bbox[1]
+#
+#         iris_list.append((point_x, point_y))
+#
+#     return iris_list
+#
+#
+# def calc_min_enc_losingCircle(landmark_list):
+#     center, radius = cv2.minEnclosingCircle(np.array(landmark_list))
+#     center = (int(center[0]), int(center[1]))
+#     radius = int(radius)
+#
+#     return center, radius
+
+
+def face_mesh_neo(debug_image, results, config):
+    if results.multi_face_landmarks is not None:
+        for face_landmarks in results.multi_face_landmarks:
+            # 外接矩形の計算
+            brect = calc_bounding_rect(debug_image, face_landmarks)
+            # 虹彩の外接円の計算
+            left_eye, right_eye = None, None
+            if config.refine_landmarks:
+                left_eye, right_eye = dfp.calc_iris_min_enc_losingCircle(
+                    debug_image,
+                    face_landmarks,
+                )
+            # 描画
+            debug_image = dfp.draw_landmarks(
+                debug_image,
+                face_landmarks,
+                config.refine_landmarks,
+                left_eye,
+                right_eye,
+            )
+            debug_image = dfp.draw_bounding_rect(config.use_brect, debug_image, brect)
+
+    return debug_image
 
 
 

@@ -5,6 +5,7 @@ height = 540
 unuse_smooth_landmarks = True
 enable_segmentation = True
 smooth_segmentation = True
+refine_landmarks = True
 
 model_complexity = 1
 min_detection_confidence = 0.5
