@@ -17,6 +17,13 @@ right_eye_lower_idx = [466, 390, 373, 374, 380, 381, 382, 362]
 
 between_the_eyebrows = [8, 9]
 
+# 鼻
+nose_top = 4
+
+# 顔右
+right_face = 280
+# 顔左
+left_face = 50
 
 # でこ
 right_head = 54
